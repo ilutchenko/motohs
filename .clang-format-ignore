@@ -1,14 +1,2 @@
 #Ignore sumbodules
-./firmware/ublox/PX4-GPSDrivers
-./firmware/compress/miniz
-./firmware/ble_protocol/json
-./firmware/ble_protocol/ArduinoJson
-./firmware/ble_protocol/ota/mcumgr
-./firmware/ble_protocol/ota/tinycbor
-./firmware/ublox/sapalib
-./firmware/logger/naturalsort
-./firmware/logger/cpp-base64
-./firmware/logger/spdlog
-./firmware/logger/fmt
-./firmware/flash_storage/esp_littlefs
-./firmware/ublox_rud/reach-ublox-daemon
+./src/logging/fmt
