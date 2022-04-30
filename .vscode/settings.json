@@ -1,0 +1,27 @@
+{
+  "configurations": [
+    {
+      "name": "ESP32",
+      "includePath": [
+        "${workspaceRoot}",
+        "${workspaceRoot}/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/include",
+        "${workspaceRoot}/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/include-fixed",
+        "${workspaceRoot}/xtensa-esp32-elf/xtensa-esp32-elf/include",
+        "${workspaceRoot}/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/usr/include",
+
+      ],
+      "intelliSenseMode": "clang-x64",
+      "browse": {
+        "path": [
+          "${workspaceRoot}",
+          "${workspaceRoot}/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/include",
+          "${workspaceRoot}/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/include-fixed",
+          "${workspaceRoot}/xtensa-esp32-elf/xtensa-esp32-elf/include",
+          "${workspaceRoot}/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/usr/include",
+        ],
+        "limitSymbolsToIncludedHeaders": true,
+        "databaseFilename": "${workspaceRoot}/.vscode/browse.vc.db"
+      }
+    }
+  ],
+}

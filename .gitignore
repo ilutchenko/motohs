@@ -1,0 +1,10 @@
+*~
+build/
+.ccache/
+*.tmp
+browse.vc*
+*.old
+*.bin
+tools/imgtool/__pycache__/
+tools/imgtool/keys/__pycache__/
+xtensa-esp32-elf/
