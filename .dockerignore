@@ -1,0 +1,7 @@
+.git/
+.github/
+.ccache/
+.vscode/
+code-quality/
+build/
+docs/
