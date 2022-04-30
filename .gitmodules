@@ -4,3 +4,6 @@
 [submodule "esp-adf"]
 	path = esp-adf
 	url = https://github.com/espressif/esp-adf.git
+[submodule "src/logging/fmt"]
+	path = src/logging/fmt
+	url = https://github.com/fmtlib/fmt.git
