@@ -24,4 +24,5 @@
       }
     }
   ],
+  "idf.adapterTargetName": "esp32",
 }
