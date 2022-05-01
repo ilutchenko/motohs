@@ -8,3 +8,4 @@ browse.vc*
 tools/imgtool/__pycache__/
 tools/imgtool/keys/__pycache__/
 xtensa-esp32-elf/
+motohs.code-workspace
