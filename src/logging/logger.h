@@ -1,10 +1,29 @@
 #pragma once
 
 #include <string>
+#include <array>
+#include <stdio.h>
+#include <time.h>
+
 #include <fmt/core.h>
+#include <fmt/chrono.h>
 
 using string_view_t = fmt::basic_string_view<char>;
 using wstring_view_t = fmt::basic_string_view<wchar_t>;
+
+// Foreground colors
+const string_view_t black = "\033[30m";
+const string_view_t red = "\033[31m";
+const string_view_t green = "\033[32m";
+const string_view_t yellow = "\033[33m";
+const string_view_t blue = "\033[34m";
+const string_view_t magenta = "\033[35m";
+const string_view_t cyan = "\033[36m";
+const string_view_t white = "\033[37m";
+/// Bold colors
+const string_view_t yellow_bold = "\033[33m\033[1m";
+const string_view_t red_bold = "\033[31m\033[1m";
+const string_view_t bold_on_red = "\033[1m\033[41m";
 
 class Logger
 {
@@ -17,6 +36,16 @@ public:
         err,
         n_levels
     };
+
+    static bool init(bool color_mode = true)
+    {
+        colors_[Logger::debug] = to_string_(cyan);
+        colors_[Logger::info] = to_string_(green);
+        colors_[Logger::warn] = to_string_(yellow_bold);
+        colors_[Logger::err] = to_string_(red_bold);
+        set_color_mode(color_mode);
+        return true;
+    }
 
     // FormatString is a type derived from fmt::compile_string
     template<typename FormatString,
@@ -69,6 +98,11 @@ public:
         log(Logger::err, tag, fmt, args...);
     }
 
+    static void set_color_mode(bool mode)
+    {
+        should_do_colors_ = mode;
+    }
+
 private:
     // common implementation for after templated public api has been resolved
     template<typename FormatString, typename... Args>
@@ -76,12 +110,31 @@ private:
                      const Args &...args)
     {
         try {
-            auto s = fmt::format(fmt, args...);
+            auto s = colors_[lvl] + prefix(tag) + fmt::format(fmt, args...);
             printf("%s\n", s.data());
         } catch (...) {
             printf("log error\n");
         }
     }
+
+    static std::string prefix(const char *tag)
+    {
+        time_t now;
+        struct tm t;
+
+        time(&now);
+        localtime_r(&now, &t);
+
+        return fmt::format("[{:%H:%M:%S}][{:^10}]:{} ", t, tag, white);
+    }
+
+    inline static std::string to_string_(const string_view_t &sv)
+    {
+        return std::string(sv.data(), sv.size());
+    }
+
+    inline static bool should_do_colors_{true};
+    inline static std::array<std::string, Logger::n_levels> colors_;
 };
 
 #define LOGI(...) Logger::log_info(TAG, __VA_ARGS__)
