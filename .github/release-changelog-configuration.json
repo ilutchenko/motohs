@@ -1,0 +1,26 @@
+{
+    "categories": [
+      {
+        "title": "## Features 💡",
+        "labels": ["feature"]
+      },
+      {
+        "title": "## Bugfixes 🛠",
+        "labels": ["fix"]
+      }
+    ],
+    "ignore_labels": [
+      "ignore"
+    ],
+    "sort": "ASC",
+    "pr_template": "- ${{TITLE}} [#${{NUMBER}}](${{URL}})",
+    "empty_template": "- no changes",
+    "duplicate_filter": {
+      "pattern": "\\[ABC-....\\]",
+      "on_property": "title",
+      "method": "match"
+    },
+    "base_branches": [
+      "master"
+    ]
+}
