@@ -1,0 +1,19 @@
+name: Clang-format lint
+on: [push]
+
+jobs:
+  clang-format:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+          ssh-key: ${{ secrets.BUILDER_SSH }}
+      - uses: DoozyX/clang-format-lint-action@v0.11
+        with:
+          source: './src/'
+          extensions: 'h,c,cpp'
+          clangFormatVersion: 11

@@ -1,0 +1,57 @@
+name: 'Build changelog'
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Get current tag name
+        id: current_tag
+        run: echo "::set-output name=TAGNAME::$(git describe --abbrev=0 --tags)"
+      - name: Get previous tag name
+        id: previous_tag
+        run: echo "::set-output name=TAGNAME::$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1))"
+      - name: Get date
+        id: date
+        run: echo "::set-output name=date::$(date +'%d.%m.%Y')"
+      - name: Generate
+        id: generate
+        uses: mikepenz/release-changelog-builder-action@v2.9.0
+        with:
+          configuration: ".github/release-changelog-configuration.json"
+          fromTag: ${{ steps.previous_tag.outputs.TAGNAME }}
+          toTag: ${{ steps.current_tag.outputs.TAGNAME }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body: ${{steps.generate.outputs.changelog}} 
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create local changes
+        run: |
+           printf '%s\n%s\n' "${{steps.generate.outputs.changelog}}" "$(cat CHANGELOG.md)" > CHANGELOG.md
+           printf '# %s [Release %s]\n\n%s' "${{ steps.current_tag.outputs.TAGNAME }}" "${{ steps.date.outputs.date }}" "$(cat CHANGELOG.md)" > CHANGELOG.md
+      - name: Commit files
+        run: |
+           git add CHANGELOG.md
+           git config --local user.email "air_hamster@bk.ru"
+           git config --local user.name "Ilia Lutchenko"
+           git commit -am "changelog: add release notes for a ${{ steps.current_tag.outputs.TAGNAME }} release"
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: "master"
