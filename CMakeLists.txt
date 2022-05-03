@@ -5,8 +5,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_COMPILER_FLAGS "-Wall -Werror -pedantic")
 set(EXTRA_COMPONENT_DIRS "./src"
+                         "./esp-adf/components"
                          "./src/logging"
-                         "./src/cli")
+                         "./src/cli"
+                         "./src/audio_module")
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 project(motoheadset)
