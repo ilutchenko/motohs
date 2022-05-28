@@ -7,3 +7,6 @@
 [submodule "src/logging/fmt"]
 	path = src/logging/fmt
 	url = https://github.com/fmtlib/fmt.git
+[submodule "src/denoise/nnom"]
+	path = src/denoise/nnom
+	url = https://github.com/majianjia/nnom.git
