@@ -7,7 +7,8 @@ set(CMAKE_COMPILER_FLAGS "-Wall -Werror -pedantic")
 set(EXTRA_COMPONENT_DIRS "./src"
                          "./esp-adf/components"
                          "./src/logging"
-                         "./src/audio_module")
+                         "./src/denoise"
+                         "./src/debug_helpers")
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 project(motoheadset)
