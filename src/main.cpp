@@ -10,6 +10,7 @@
 #include "audio_element.h"
 #include "i2s_stream.h"
 #include "driver/i2s.h"
+#include "filter_rnnoise.h"
 
 const char TAG[] = "Main";
 #define I2S_BCK_IO (GPIO_NUM_13)
@@ -40,15 +41,19 @@ void app_main(void)
 
     ESP_LOGI(TAG, "[3.1] Create i2s stream to write data to codec chip");
     i2s_stream_cfg_t i2s_cfg = I2S_STREAM_CFG_DEFAULT();
-    i2s_cfg.i2s_config.sample_rate = 48000;
+    i2s_cfg.i2s_config.sample_rate = 16000;
     i2s_stream_cfg_t i2s_cfg1 = I2S_STREAM_CFG_DEFAULT();
-    i2s_cfg1.i2s_config.sample_rate = 48000;
+    i2s_cfg1.i2s_config.sample_rate = 16000;
 
     i2s_cfg.type = AUDIO_STREAM_WRITER;
     i2s_stream_writer = i2s_stream_init(&i2s_cfg);
 
     i2s_cfg1.type = AUDIO_STREAM_READER;
     i2s_stream_reader = i2s_stream_init(&i2s_cfg1);
+    
+    rnnoise_filter_cfg_t rnnoise_cfg = DEFAULT_RNNOISE_FILTER_CONFIG();
+    rnnoise_cfg.max_indata_bytes = FRAME_SIZE;
+    rnnoise_filter = rnnoise_filter_init(&rnnoise_cfg);
 
     i2s_pin_config_t i2sPins = {.bck_io_num = I2S_BCK_IO,
                                 .ws_io_num = I2S_WS_IO,
@@ -65,13 +70,18 @@ void app_main(void)
     ESP_LOGI(TAG, "[3.2] Register all elements to audio pipeline");
     audio_pipeline_register(pipeline, i2s_stream_writer, "i2s");
     audio_pipeline_register(pipeline, i2s_stream_reader, "i2s_mic");
-    
-    const char *link_tag[2] = {"i2s_mic", "i2s"};
-    audio_pipeline_link(pipeline, &link_tag[0], 2);
+    audio_pipeline_register(pipeline, rnnoise_filter, "rnnoise");
+
+    const char *link_tag[3] = {"i2s_mic", "rnnoise", "i2s"};
+    audio_pipeline_link(pipeline, &link_tag[0], 3);
 
     ESP_LOGI(TAG, "[ 6 ] Start audio_pipeline");
     audio_pipeline_run(pipeline);
 
+    while (1){
+        printf("SECOND\n");
+        vTaskDelay(100);
+    }
     /* Sheduler started automatically on boot,
         so we don't need to call vTaskStartScheduler()*/
 }

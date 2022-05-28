@@ -7,6 +7,8 @@ set(CMAKE_COMPILER_FLAGS "-Wall -Werror -pedantic")
 set(EXTRA_COMPONENT_DIRS "./src"
                          "./esp-adf/components"
                          "./src/logging"
+                         "./src/denoise"
+                         "./src/debug_helpers"
                          "./src/cli"
                          "./src/audio_module")
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
