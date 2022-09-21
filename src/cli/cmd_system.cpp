@@ -14,6 +14,7 @@
 #include "freertos/task.h"
 #include "console.h"
 #include "sdkconfig.h"
+#include "filter_rnnoise.h"
 
 #ifdef CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
 #define WITH_TASKS_INFO 1
@@ -23,6 +24,7 @@
 
 static void register_free(void);
 static void register_restart(void);
+static void register_filter(void);
 
 #if WITH_TASKS_INFO
 static void register_tasks(void);
@@ -32,6 +34,7 @@ void register_system(void)
 {
     register_free();
     register_restart();
+    register_filter();
 #if WITH_TASKS_INFO
     register_tasks();
 #endif
@@ -211,3 +214,35 @@ static void register_tasks(void)
 }
 
 #endif // WITH_TASKS_INFO
+
+static struct {
+    struct arg_int *mode;
+    struct arg_end *end;
+} filter_args;
+
+/* 'restart' command restarts the program */
+static int filter(int argc, char **argv)
+{
+    int nerrors = arg_parse(argc, argv, reinterpret_cast<void **>(&filter_args));
+    if (nerrors != 0) {
+        arg_print_errors(stderr, filter_args.end, argv[0]);
+        ESP_LOGE(TAG, "Arguments parsing error");
+        return -1;
+    }
+
+    int mode = filter_args.mode->ival[0];
+    enable_filter((mode == 1));
+    return 0;
+}
+
+static void register_filter(void)
+{
+    filter_args.mode = arg_int1(nullptr, nullptr, "<1|0>", "1|0");
+    filter_args.end = arg_end(1);
+    const esp_console_cmd_t cmd = {.command = "filter",
+                                   .help = "Enable/disable noise filter",
+                                   .hint = "1|0",
+                                   .func = &filter,
+                                   .argtable = &filter_args};
+    ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
+}
