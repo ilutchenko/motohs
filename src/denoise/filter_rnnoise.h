@@ -11,6 +11,8 @@ extern "C"
 {
 #endif
 
+void enable_filter(bool en);
+
 /**
  * @brief      Resample Filter Configuration
  */
