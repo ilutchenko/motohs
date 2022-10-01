@@ -2,29 +2,72 @@
 
 using namespace MotoHS::System;
 
-SystemTask::SystemTask()
+namespace {
+    static inline bool in_isr()
+    {
+        return xPortInIsrContext();
+    }
+} // namespace
+
+SystemTask::SystemTask(Controllers::ButtonHandler& button) : button_handler(button)
 {
 }
 
-void SystemTask::start()
+void SystemTask::Start()
 {
-    m_msg_queue = xQueueCreate(10, 1);
+    msg_queue = xQueueCreate(10, sizeof(Msg));
     if (pdPASS !=
-        xTaskCreate(SystemTask::process, "SYS_TASK", 4096, this, 1, &m_task_handle)) {
+        xTaskCreate(SystemTask::Process, "SYS_TASK", 4096, this, 1, &task_handle)) {
     }
 }
 
-void SystemTask::process(void* instance)
+void SystemTask::PushMessage(MsgType type, MsgData data)
 {
-    auto* app = static_cast<SystemTask*>(instance);
-    app->run();
+    Msg message;
+    message.type = type;
+    message.data = data;
+    if (in_isr()) {
+        BaseType_t xHigherPriorityTaskWoken;
+        xHigherPriorityTaskWoken = pdFALSE;
+        xQueueSendFromISR(msg_queue, &message, &xHigherPriorityTaskWoken);
+        if (xHigherPriorityTaskWoken) {
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        }
+    } else {
+        xQueueSend(msg_queue, &message, portMAX_DELAY);
+    }
 }
 
-void SystemTask::run()
+void SystemTask::Process(void* instance)
 {
+    auto* app = static_cast<SystemTask*>(instance);
+    app->Run();
+}
+
+void SystemTask::Run()
+{
+    button_handler.Init(this);
+
     while (true) {
-        uint8_t msg;
-        if (xQueueReceive(m_msg_queue, &msg, 100)) {
+        Msg msg;
+        if (xQueueReceive(msg_queue, &msg, 100)) {
+            if (msg.type == SystemTask::MsgType::ButtonEvent) {
+                ProcessButtonEvent(msg.data);
+            }
         }
+    }
+}
+
+void SystemTask::ProcessButtonEvent(MsgData data)
+{
+    if (std::get<Controllers::ButtonActions>(data) ==
+        Controllers::ButtonActions::ShortClick) {
+        printf("Short click\n");
+    } else if (std::get<Controllers::ButtonActions>(data) ==
+               Controllers::ButtonActions::LongPress) {
+        printf("Long press\n");
+    } else if (std::get<Controllers::ButtonActions>(data) ==
+               Controllers::ButtonActions::LongClick) {
+        printf("Long Click\n");
     }
 }
