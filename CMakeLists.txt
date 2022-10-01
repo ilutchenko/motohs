@@ -7,7 +7,8 @@ set(CMAKE_COMPILER_FLAGS "-Wall -Werror -pedantic")
 set(EXTRA_COMPONENT_DIRS "./src"
                          "./src/logging"
                          "./src/cli"
-                         "./src/system_task")
+                         "./src/system_task"
+                         "./src/button")
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 project(motoheadset)
