@@ -14,9 +14,9 @@
 
 TaskHandle_t TaskHandleCommandLine;
 namespace {
-constexpr auto PRIORITY = 15;
-constexpr auto STACK_SIZE = 10 * configMINIMAL_STACK_SIZE;
-constexpr auto TASK_CORE = 0;
+    constexpr auto PRIORITY = 15;
+    constexpr auto STACK_SIZE = 10 * configMINIMAL_STACK_SIZE;
+    constexpr auto TASK_CORE = 0;
 } // namespace
 
 static void initialize_console(void)
